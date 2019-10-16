@@ -41,6 +41,7 @@
     url: "{{prometheus_download_url}}{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
     dest: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
     checksum: "sha256:{{ prometheus_checksum }}"
+    validate_certs: False
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5
