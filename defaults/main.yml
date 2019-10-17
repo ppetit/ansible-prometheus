@@ -144,7 +144,3 @@ prometheus_alert_rules:
       summary: "{% raw %}Instance {{ $labels.instance }} - Clock skew detected{% endraw %}"
 
 prometheus_download_url: "https://github.com/prometheus/prometheus/releases/download/v"
-prometheus_download_auth:
-  username: "omit"
-  password: "omit"
-  validate_certs: True
