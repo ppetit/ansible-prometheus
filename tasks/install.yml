@@ -38,12 +38,12 @@
 - name: download prometheus binary to local folder
   become: false
   get_url:
-    url: "{{prometheus_download.url}}{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
+    url: "{{prometheus_download_url}}{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
     dest: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
     checksum: "sha256:{{ prometheus_checksum }}"
-    url_username: "{{ prometheus_download.username }}"
-    url_password: "{{ prometheus_download.password }}"
-    validate_certs: "{{ prometheus_download.validate_certs }}"
+    url_username: "{{ prometheus_download_auth.username }}"
+    url_password: "{{ prometheus_download_auth.password }}"
+    validate_certs: "{{ prometheus_download_auth.validate_certs }}"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5
