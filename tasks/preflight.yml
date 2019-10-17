@@ -96,6 +96,10 @@
 - name: "Get checksum for {{ go_arch }} architecture"
   set_fact:
     prometheus_checksum: "{{ item.split(' ')[0] }}"
+  when:
+    - prometheus_checksum is not defined
+    - "('linux-' + go_arch + '.tar.gz') in item"
   with_items:
-    - "{{ query('url', prometheus_download.url + prometheus_version + '/sha256sums.txt', username=prometheus_download.username, password=prometheus_download.password, validate_certs=prometheus_download.validate_certs) | list }}"
-  when: "('linux-' + go_arch + '.tar.gz') in item"
+    - "{{ lookup('url', prometheus_download.url + prometheus_version + '/sha256sums.txt', wantlist=True) | list }}"
+  
+  no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"

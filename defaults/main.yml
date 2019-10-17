@@ -145,6 +145,6 @@ prometheus_alert_rules:
 
 prometheus_download:
   url: "https://github.com/prometheus/prometheus/releases/download/v"
-  username: ""
-  password: ""
-  validate_cert: True
+  username: "omit"
+  password: "omit"
+  validate_certs: True
