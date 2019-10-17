@@ -1,6 +1,5 @@
 ---
 prometheus_version: 2.13.0
-prometheus_download_url: "https://github.com/prometheus/prometheus/releases/download/v"
 
 prometheus_config_dir: /etc/prometheus
 prometheus_db_dir: /var/lib/prometheus
@@ -143,3 +142,9 @@ prometheus_alert_rules:
     annotations:
       description: "{% raw %}Clock skew detected on {{ $labels.instance }}. Ensure NTP is configured correctly on this host.{% endraw %}"
       summary: "{% raw %}Instance {{ $labels.instance }} - Clock skew detected{% endraw %}"
+
+prometheus_download:
+  url: "https://github.com/prometheus/prometheus/releases/download/v"
+  username: ""
+  password: ""
+  validate_cert: True
