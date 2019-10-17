@@ -1,4 +1,17 @@
 ---
+- name: Install SELinux dependencies
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ prometheus_selinux_packages }}"
+  register: _install_packages
+  until: _install_packages is succeeded
+  retries: 5
+  delay: 2
+  when:
+    - ansible_version.full is version_compare('2.4', '>=')
+    - ansible_selinux.status == "enabled"
+    
 - name: create prometheus system group
   group:
     name: prometheus
@@ -48,7 +61,7 @@
   until: _download_archive is succeeded
   retries: 5
   delay: 2
-  # run_once: true # <-- this cannot be set due to multi-arch support
+  run_once: true
   delegate_to: localhost
   check_mode: false
   no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
@@ -97,19 +110,6 @@
     mode: 0644
   notify:
     - restart prometheus
-
-- name: Install SELinux dependencies
-  package:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ prometheus_selinux_packages }}"
-  register: _install_packages
-  until: _install_packages is succeeded
-  retries: 5
-  delay: 2
-  when:
-    - ansible_version.full is version_compare('2.4', '>=')
-    - ansible_selinux.status == "enabled"
 
 - name: Allow prometheus to bind to port in SELinux
   seport:
