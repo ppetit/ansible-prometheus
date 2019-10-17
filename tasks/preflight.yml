@@ -93,13 +93,11 @@
         prometheus_version: "{{ _latest_release.json.tag_name[1:] }}"
   when: prometheus_version == "latest"
 
-- name: "Get checksum for {{ go_arch }} architecture"
-  set_fact:
-    prometheus_checksum: "{{ item.split(' ')[0] }}"
-  when:
-    - prometheus_checksum is not defined
-    - "('linux-' + go_arch + '.tar.gz') in item"
-  with_items:
-    - "{{ lookup('url', prometheus_download.url + prometheus_version + '/sha256sums.txt', wantlist=True) | list }}"
-  
-  no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
+- block:
+    - name: "Get checksum for {{ go_arch }} architecture"
+      set_fact:
+        prometheus_checksum: "{{ item.split(' ')[0] }}"
+      with_items:
+        - "{{ lookup('url', 'https://github.com/prometheus/prometheus/releases/download/v' + prometheus_version + '/sha256sums.txt', wantlist=True) | list }}"
+      when: "('linux-' + go_arch + '.tar.gz') in item"
+  when: prometheus_checksum is not defined
