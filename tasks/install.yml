@@ -1,16 +1,13 @@
 ---
-- name: Install SELinux dependencies
-  package:
-    name: "{{ item }}"
+- name: Allow prometheus to bind to port in SELinux
+  seport:
+    ports: "{{ prometheus_web_listen_address.split(':')[1] }}"
+    proto: tcp
+    setype: http_port_t
     state: present
-  with_items: "{{ prometheus_selinux_packages }}"
-  register: _install_packages
-  until: _install_packages is succeeded
-  retries: 5
-  delay: 2
   when:
     - ansible_version.full is version_compare('2.4', '>=')
-    - ansible_selinux_python_present | bool == False
+    - ansible_selinux.status == "enabled"
 
 - name: create prometheus system group
   group:
@@ -47,6 +44,14 @@
     - "{{ prometheus_config_dir }}/conf.d"
     - "{{ prometheus_config_dir }}/rules"
     - "{{ prometheus_config_dir }}/file_sd"
+
+- name: create systemd service unit
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: 0644
 
 - name: download prometheus binary to local folder
   become: false
@@ -101,22 +106,3 @@
   notify:
     - restart prometheus
 
-- name: create systemd service unit
-  template:
-    src: prometheus.service.j2
-    dest: /etc/systemd/system/prometheus.service
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - restart prometheus
-
-- name: Allow prometheus to bind to port in SELinux
-  seport:
-    ports: "{{ prometheus_web_listen_address.split(':')[1] }}"
-    proto: tcp
-    setype: http_port_t
-    state: present
-  when:
-    - ansible_version.full is version_compare('2.4', '>=')
-    - ansible_selinux.status == "enabled"
