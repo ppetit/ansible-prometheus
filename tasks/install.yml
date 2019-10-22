@@ -45,14 +45,6 @@
     - "{{ prometheus_config_dir }}/rules"
     - "{{ prometheus_config_dir }}/file_sd"
 
-- name: create systemd service unit
-  template:
-    src: prometheus.service.j2
-    dest: /etc/systemd/system/prometheus.service
-    owner: root
-    group: root
-    mode: 0644
-
 - name: download prometheus binary to local folder
   become: false
   get_url:
@@ -71,6 +63,14 @@
   check_mode: false
   no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
 
+- name: create systemd service unit
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: 0644
+
 - name: unpack prometheus binaries
   become: false
   unarchive:
@@ -80,6 +80,17 @@
   delegate_to: localhost
   check_mode: false
 
+- name: propagate console templates
+  copy:
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/{{ item }}/"
+    dest: "{{ prometheus_config_dir }}/{{ item }}/"
+    mode: 0644
+    owner: root
+    group: root
+  with_items:
+    - console_libraries
+    - consoles
+  
 - name: propagate prometheus and promtool binaries
   copy:
     src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/{{ item }}"
@@ -92,17 +103,3 @@
     - promtool
   notify:
     - restart prometheus
-
-- name: propagate console templates
-  copy:
-    src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/{{ item }}/"
-    dest: "{{ prometheus_config_dir }}/{{ item }}/"
-    mode: 0644
-    owner: root
-    group: root
-  with_items:
-    - console_libraries
-    - consoles
-  notify:
-    - restart prometheus
-
