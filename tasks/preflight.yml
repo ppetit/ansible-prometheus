@@ -104,7 +104,7 @@
 - name: "Get checksum for {{ go_arch_map[ansible_architecture] | default(ansible_architecture) }} architecture"
   set_fact:
     prometheus_checksum: "{{ item.split(' ')[0] }}"
-  with_items: "{{ lookup('url', prometheus_download_url + prometheus_version + '/sha256sums.txt', wantlist=True) | list }}"
+  with_items: "{{ _checksums }}"
   when:
     - prometheus_checksum is not defined
     - "('linux-' + go_arch + '.tar.gz') in item"
