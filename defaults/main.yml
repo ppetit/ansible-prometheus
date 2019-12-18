@@ -7,6 +7,8 @@ prometheus_db_dir: /var/lib/prometheus
 prometheus_web_listen_address: "0.0.0.0:9090"
 prometheus_web_external_url: ''
 
+prometheus_download_url: "https://github.com/prometheus/prometheus/releases/download/v"
+
 prometheus_storage_retention: "30d"
 # Available since Prometheus 2.7.0
 # [EXPERIMENTAL] Maximum number of bytes that can be stored for blocks. Units
@@ -96,13 +98,11 @@ prometheus_alert_rules:
         "DeadMansSnitch" integration in PagerDuty.'
       summary: 'Ensure entire alerting pipeline is functional'
   - alert: InstanceDown
-    annotations:
-      description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for
-        more than 5 minutes.'
-      summary: Instance {{ $labels.instance }} down
     expr: up == 0
     for: 5m
     labels:
       severity: warning
-
-prometheus_download_url: "https://github.com/prometheus/prometheus/releases/download/v"
+    annotations:
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for
+        more than 5 minutes."
+      summary: "Instance {{ $labels.instance }} down"
