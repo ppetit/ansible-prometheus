@@ -97,12 +97,4 @@ prometheus_alert_rules:
         mechanisms that send a notification when this alert is not firing. For example the
         "DeadMansSnitch" integration in PagerDuty.'
       summary: 'Ensure entire alerting pipeline is functional'
-  - alert: InstanceDown
-    expr: up == 0
-    for: 5m
-    labels:
-      severity: warning
-    annotations:
-      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for
-        more than 5 minutes."
-      summary: "Instance {{ $labels.instance }} down"
+ 
